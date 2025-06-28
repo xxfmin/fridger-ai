@@ -1,6 +1,6 @@
 # virtual environment
 venv/
-*lib
+venv/lib
 
 # python cache
 __pycache__/
