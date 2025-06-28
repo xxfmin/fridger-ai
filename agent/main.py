@@ -892,7 +892,6 @@ class ChatMessage(BaseModel):
     message: Optional[str] = None
 
 @app.post("/chat")
-@app.post("/chat")
 async def chat_with_assistant(body: ChatMessage):
     """
     Stream processing updates to the frontend in real-time
@@ -917,22 +916,26 @@ async def chat_with_assistant(body: ChatMessage):
                     # Log that we're starting the process
                     logfire.info("Starting recipe assistant workflow with image")
                     
-                    # Step 1: Extract ingredients
-                    yield json.dumps({
-                        "type": "step_update",
-                        "step": {
-                            "step_name": "Extract Ingredients",
-                            "status": "in_progress",
-                            "message": "Analyzing fridge contents..."
-                        }
-                    }) + "\n"
+                    # Track completion state for each step
+                    step_states = {
+                        "Extract Ingredients": {"completed": False, "data": None},
+                        "Format Ingredients": {"completed": False, "data": None},
+                        "Search Recipes": {"completed": False, "data": None},
+                        "Get Recipe Details": {"completed": False, "data": None}
+                    }
                     
                     try:
-                        # First ensure the tool is called properly
-                        # The issue was that the agent wasn't being forced to use the tool
-                        # We need to explicitly tell it to analyze the image
+                        # Step 1: Extract ingredients
+                        yield json.dumps({
+                            "type": "step_update",
+                            "step": {
+                                "step_name": "Extract Ingredients",
+                                "status": "in_progress",
+                                "message": "Analyzing fridge contents..."
+                            }
+                        }) + "\n"
                         
-                        # Run the agent with a clear instruction
+                        # Run extraction
                         extraction_result = await main_agent.run(
                             "Use the analyze_fridge_contents tool to analyze the fridge image and extract all visible ingredients. The image is already in the context, so call the tool without any parameters.",
                             deps=deps
@@ -941,6 +944,8 @@ async def chat_with_assistant(body: ChatMessage):
                         # Check if ingredients were extracted
                         if deps.last_extracted_ingredients and deps.last_extracted_ingredients.ingredients:
                             ingredients = deps.last_extracted_ingredients.ingredients
+                            step_states["Extract Ingredients"]["completed"] = True
+                            step_states["Extract Ingredients"]["data"] = ingredients
                             
                             yield json.dumps({
                                 "type": "step_complete",
@@ -964,13 +969,17 @@ async def chat_with_assistant(body: ChatMessage):
                                 }
                             }) + "\n"
                             
-                            # Run formatting - be explicit about using the tool
+                            # Run formatting
                             format_result = await main_agent.run(
                                 "Format the extracted ingredients for recipe search using format_ingredients_for_recipes tool.",
                                 deps=deps
                             )
                             
-                            if deps.last_formatted_params:
+                            if deps.last_formatted_params and deps.last_formatted_params.ingredients:
+                                formatted = deps.last_formatted_params.ingredients
+                                step_states["Format Ingredients"]["completed"] = True
+                                step_states["Format Ingredients"]["data"] = formatted
+                                
                                 yield json.dumps({
                                     "type": "step_complete",
                                     "step": {
@@ -979,7 +988,7 @@ async def chat_with_assistant(body: ChatMessage):
                                         "message": "Ingredients formatted successfully"
                                     },
                                     "data": {
-                                        "formatted": deps.last_formatted_params.ingredients
+                                        "formatted": formatted
                                     }
                                 }) + "\n"
                                 
@@ -1002,6 +1011,8 @@ async def chat_with_assistant(body: ChatMessage):
                                 
                                 if deps.last_recipes:
                                     recipes_count = len(deps.last_recipes)
+                                    step_states["Search Recipes"]["completed"] = True
+                                    step_states["Search Recipes"]["data"] = recipes_count
                                     
                                     yield json.dumps({
                                         "type": "step_complete",
@@ -1042,6 +1053,22 @@ async def chat_with_assistant(body: ChatMessage):
                                     # Process and send final results
                                     recipes_data = []
                                     if deps.all_recipe_details:
+                                        details_count = len(deps.all_recipe_details)
+                                        step_states["Get Recipe Details"]["completed"] = True
+                                        step_states["Get Recipe Details"]["data"] = details_count
+                                        
+                                        yield json.dumps({
+                                            "type": "step_complete",
+                                            "step": {
+                                                "step_name": "Get Recipe Details",
+                                                "status": "completed",
+                                                "message": f"Retrieved details for {details_count} recipes"
+                                            },
+                                            "data": {
+                                                "details_count": details_count
+                                            }
+                                        }) + "\n"
+                                        
                                         for recipe in deps.all_recipe_details:
                                             # Create recipe dict following RecipeDetails model structure
                                             recipe_dict = {
@@ -1049,7 +1076,7 @@ async def chat_with_assistant(body: ChatMessage):
                                                 "title": recipe.title,
                                                 "readyInMinutes": recipe.readyInMinutes,
                                                 "image": recipe.image,
-                                                "summary": recipe.summary,  # Include summary
+                                                "summary": recipe.summary,
                                                 "preparationMinutes": recipe.preparationMinutes,
                                                 "cookingMinutes": recipe.cookingMinutes,
                                                 "nutrition": {
@@ -1085,19 +1112,7 @@ async def chat_with_assistant(body: ChatMessage):
                                             
                                             recipes_data.append(recipe_dict)
                                     
-                                    yield json.dumps({
-                                        "type": "step_complete",
-                                        "step": {
-                                            "step_name": "Get Recipe Details",
-                                            "status": "completed",
-                                            "message": f"Retrieved details for {len(recipes_data)} recipes"
-                                        },
-                                        "data": {
-                                            "details_count": len(recipes_data)
-                                        }
-                                    }) + "\n"
-                                    
-                                    # Send final complete message
+                                    # Send final complete message with all data
                                     final_message = "I found some great recipes based on what's in your fridge!"
                                     if len(recipes_data) > 0:
                                         final_message = f"I found {len(recipes_data)} delicious recipes you can make with your ingredients! Swipe through the recipes below to find something you'd like to cook."
@@ -1109,60 +1124,64 @@ async def chat_with_assistant(body: ChatMessage):
                                             "total_ingredients": len(ingredients),
                                             "total_recipes": len(recipes_data),
                                             "recipes": recipes_data
-                                        }
+                                        },
+                                        "step_summary": step_states  # Include step completion summary
                                     }) + "\n"
                                     
                                 else:
+                                    # No recipes found
                                     yield json.dumps({
                                         "type": "error",
                                         "step": {
                                             "step_name": "Search Recipes",
                                             "status": "error",
                                             "message": "No recipes found with the available ingredients"
-                                        }
+                                        },
+                                        "step_summary": step_states
                                     }) + "\n"
                             else:
+                                # Format failed
                                 yield json.dumps({
                                     "type": "error",
                                     "step": {
                                         "step_name": "Format Ingredients",
                                         "status": "error",
                                         "message": "Failed to format ingredients for recipe search"
-                                    }
+                                    },
+                                    "step_summary": step_states
                                 }) + "\n"
                         else:
+                            # No ingredients extracted
                             yield json.dumps({
                                 "type": "error",
                                 "step": {
                                     "step_name": "Extract Ingredients",
                                     "status": "error",
                                     "message": "No ingredients could be extracted from the image. Please ensure the image shows the contents of a fridge clearly."
-                                }
+                                },
+                                "step_summary": step_states
                             }) + "\n"
                             
                     except Exception as e:
                         logfire.error(f"Error in processing pipeline: {str(e)}", exc_info=True)
                         
                         # Determine which step failed based on the context
-                        step_name = "Processing"
-                        if not deps.last_extracted_ingredients:
-                            step_name = "Extract Ingredients"
-                        elif not deps.last_formatted_params:
-                            step_name = "Format Ingredients"
-                        elif not deps.last_recipes:
-                            step_name = "Search Recipes"
-                        else:
-                            step_name = "Get Recipe Details"
+                        failed_step = "Processing"
+                        for step_name, state in step_states.items():
+                            if not state["completed"]:
+                                failed_step = step_name
+                                break
                         
                         yield json.dumps({
                             "type": "error",
                             "step": {
-                                "step_name": step_name,
+                                "step_name": failed_step,
                                 "status": "error",
-                                "message": f"Error during {step_name.lower()}: {str(e)}"
+                                "message": f"Error during {failed_step.lower()}: {str(e)}"
                             },
                             "error": str(e),
-                            "message": f"I encountered an error while processing your request: {str(e)}"
+                            "message": f"I encountered an error while processing your request: {str(e)}",
+                            "step_summary": step_states
                         }) + "\n"
                 
                 else:
