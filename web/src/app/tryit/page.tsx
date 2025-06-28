@@ -1,7 +1,7 @@
+// src/app/chat/page.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { BiSend, BiCamera, BiImage } from 'react-icons/bi';
 import Navbar from '@/components/navbar';
 import { AuroraBackground } from '@/components/aurora-background';
@@ -20,12 +20,11 @@ export default function ChatPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // scroll to bottom on new message
+  // auto-scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // send message handler
   const sendMessage = () => {
     if (!input.trim() && !preview) return;
     const newMsg: Message = { fromUser: true };
@@ -34,21 +33,14 @@ export default function ChatPage() {
     setMessages(prev => [...prev, newMsg]);
     setInput('');
     setPreview(null);
-    // dummy bot response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { text: '🤖 Processing your food image...', fromUser: false }]);
-    }, 500);
   };
 
-  // file upload
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setPreview(URL.createObjectURL(e.target.files[0]));
-      stopCamera();
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPreview(URL.createObjectURL(file));
   };
 
-  // camera start/stop
   const startCamera = async () => {
     if (stream) return;
     try {
@@ -58,10 +50,11 @@ export default function ChatPage() {
         videoRef.current.srcObject = media;
         await videoRef.current.play();
       }
-    } catch (err) {
-      console.error('Camera error', err);
+    } catch {
+      console.warn('Camera not available');
     }
   };
+
   const capturePhoto = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -70,9 +63,6 @@ export default function ChatPage() {
     canvas.height = video.videoHeight;
     canvas.getContext('2d')!.drawImage(video, 0, 0);
     setPreview(canvas.toDataURL('image/jpeg'));
-    stopCamera();
-  };
-  const stopCamera = () => {
     stream?.getTracks().forEach(t => t.stop());
     setStream(null);
   };
@@ -80,38 +70,71 @@ export default function ChatPage() {
   return (
     <AuroraBackground>
       <Navbar />
+
       <div className="flex justify-center py-6">
-        <div className="max-w-3xl flex flex-col bg-white/20 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden h-[calc(100vh-10rem)]">
+        <div className="w-full max-w-3xl flex flex-col bg-white/20 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden h-[calc(100vh-8rem)]">
           {/* Chat window */}
           <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
             {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.fromUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`${msg.fromUser ? 'bg-[#0096FF] text-white' : 'bg-white text-black'} max-w-xs md:max-w-md rounded-lg p-3 shadow`}>
+              <div
+                key={i}
+                className={`flex ${msg.fromUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs md:max-w-md rounded-lg p-3 shadow ${
+                    msg.fromUser
+                      ? 'bg-[#0096FF] text-white'
+                      : 'bg-white text-black'
+                  }`}
+                >
                   {msg.text && <p className="whitespace-pre-wrap">{msg.text}</p>}
-                  {msg.image && <img src={msg.image} alt="upload" className="mt-2 max-h-60 w-auto rounded" />}
+                  {msg.image && (
+                    <img
+                      src={msg.image}
+                      alt="uploaded"
+                      className="mt-2 max-h-60 w-auto rounded"
+                    />
+                  )}
                 </div>
               </div>
             ))}
             <div ref={chatEndRef} />
           </div>
-          {/* Preview or Video */}
+
+          {/* Preview / Video */}
           {preview && (
             <div className="px-4 mb-2">
-              <img src={preview} alt="preview" className="mx-auto max-h-32 rounded shadow-lg" />
+              <img
+                src={preview}
+                alt="preview"
+                className="mx-auto max-h-32 rounded shadow-lg"
+              />
             </div>
           )}
           {stream && (
             <div className="px-4 mb-2">
-              <video ref={videoRef} className="mx-auto max-h-32 rounded shadow-lg" />
+              <video
+                ref={videoRef}
+                className="mx-auto max-h-32 rounded shadow-lg"
+              />
             </div>
           )}
-          {/* Input area */}
+
+          {/* Input Controls */}
           <div className="flex items-center px-4 pb-4">
             <label className="p-2 text-white hover:text-gray-200 cursor-pointer">
               <BiImage size={24} />
-              <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFile}
+              />
             </label>
-            <button onClick={stream ? capturePhoto : startCamera} className="p-2 text-white hover:text-gray-200">
+            <button
+              onClick={stream ? capturePhoto : startCamera}
+              className="p-2 text-white hover:text-gray-200"
+            >
               <BiCamera size={24} />
             </button>
             <textarea
@@ -121,7 +144,10 @@ export default function ChatPage() {
               className="flex-1 mx-2 resize-none rounded-lg border border-white/30 bg-black/30 p-2 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0096FF]"
               placeholder="Type your prompt here..."
             />
-            <button onClick={sendMessage} className="p-2 text-white hover:text-gray-200">
+            <button
+              onClick={sendMessage}
+              className="p-2 text-white hover:text-gray-200"
+            >
               <BiSend size={24} />
             </button>
           </div>
