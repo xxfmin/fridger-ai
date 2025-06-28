@@ -1,66 +1,91 @@
 'use client';
 
-import React from 'react';
-import Navbar from '@/components/navbar';   
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+
+import Navbar from '@/components/navbar';
 import { AuroraBackground } from '@/components/aurora-background';
-import axios from 'axios'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Head from 'next/head'
 
 export default function SignInPage() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
+  const router = useRouter();
 
-  const handleSignIn = async () => {
-    setError('')
-    try {
-      const { data } = await axios.post('/api/users/login', {
-        username,
-        password,
-      })
-      router.push(`/profile/${username}`)
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Login Failed.')
-      console.error(error)
+  const [username,   setUsername]   = useState('');
+  const [password,   setPassword]   = useState('');
+  const [error,      setError]      = useState<string | null>(null);
+  const [isLoading,  setIsLoading]  = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!username.trim() || !password) {
+      setError('Both fields are required');
+      return;
     }
-  }
+
+    setIsLoading(true);
+    const result = await signIn('credentials', {
+      redirect: false,
+      username: username.trim(),
+      password,
+    });
+
+    setIsLoading(false);
+
+    if (result?.error) {
+      setError('Invalid username or password');
+    } else {
+      // On success, redirect wherever you like:
+      router.push('/dashboard');
+    }
+  };
 
   return (
     <AuroraBackground>
       <Navbar />
 
       <div className="flex items-center justify-center min-h-screen text-white">
-        <div className=" backdrop-blur-lg p-8 rounded-lg shadow-lg w-full max-w-sm">
+        <div className="backdrop-blur-lg p-8 rounded-lg shadow-lg w-full max-w-sm">
           <h2 className="text-3xl font-bold mb-6 text-center">Sign In</h2>
-          <form>
-            <div className="mb-5">
-              <label className="block mb-1 font-medium">Email or Username</label>
+
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block mb-1 font-medium">Username</label>
               <input
+                type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-6 py-2 border border-white rounded-md bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white text-left"
+                disabled={isLoading}
+                className="w-full px-4 py-2 border rounded bg-white text-black focus:outline-none"
                 placeholder="you@example.com"
               />
             </div>
-            <div className="mb-6">
+
+            <div>
               <label className="block mb-1 font-medium">Password</label>
               <input
+                type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="password"
-                className="w-full px-6 py-2 border border-white rounded-md bg-transparent text-left text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white "
+                disabled={isLoading}
+                className="w-full px-4 py-2 border rounded bg-white text-black focus:outline-none"
+                placeholder="••••••••"
               />
             </div>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
+
             <button
-              type="button"
-              onClick={handleSignIn}
-              className="w-full bg-inherit border border-white text-white py-2 rounded-md hover:bg-white/20 transition"
+              type="submit"
+              disabled={isLoading}
+              className={`w-full py-2 font-semibold rounded ${
+                isLoading
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-700 text-white'
+              }`}
             >
-              Sign In
+              {isLoading ? 'Signing In…' : 'Sign In'}
             </button>
           </form>
         </div>
