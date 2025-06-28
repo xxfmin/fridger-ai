@@ -3,6 +3,7 @@
 import React from 'react';
 import Navbar from '@/components/navbar';   
 import { AuroraBackground } from '@/components/aurora-background';
+import Link from 'next/link';
 
 export default function SignInPage() {
   return (
@@ -29,12 +30,14 @@ export default function SignInPage() {
                 
               />
             </div>
+            <Link href="/">
             <button
               type="submit"
               className="w-full bg-inherit border border-white text-white py-2 rounded-md hover:bg-white/20 transition"
             >
               Sign In
             </button>
+            </Link>
           </form>
         </div>
       </div>
