@@ -1,4 +1,3 @@
-// recipe structure 
 interface NutritionInfo {
   calories?: number;
   fat?: number;
