@@ -16,7 +16,7 @@ export default function MyRecipesPage() {
 
   const loadRecipes = async () => {
     try {
-      const response = await fetch("/api/recipes", {
+      const response = await fetch("/api/recipe", {
         credentials: "include",
       });
       if (response.ok) {
