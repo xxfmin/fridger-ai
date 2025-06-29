@@ -234,99 +234,117 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl h-screen flex flex-col p-4">
-      {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">Recipe Assistant</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Upload a photo of your fridge or ask me anything about cooking!
-        </p>
+    <div className="flex flex-col h-full">
+      {/* Header - matching my-recipes page styling */}
+      <div className="flex-none border-b bg-background px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Recipe Assistant</h1>
+            <p className="text-sm text-muted-foreground">
+              Upload a photo of your fridge or ask me anything about cooking!
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        {messages.length === 0 && (
-          <Card className="p-8 text-center text-gray-500">
-            <p className="mb-2">
-              👋 Welcome! I can help you find recipes based on what's in your
-              fridge.
-            </p>
-            <p>
-              Upload a photo of your fridge or ask me any cooking questions!
-            </p>
-          </Card>
-        )}
+      {/* Content area */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <Card className="p-8 text-center text-gray-500 max-w-lg">
+              <p className="mb-2 text-lg">
+                👋 Welcome! I can help you find recipes based on what's in your
+                fridge.
+              </p>
+              <p>
+                Upload a photo of your fridge or ask me any cooking questions!
+              </p>
+            </Card>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-4xl">
+            <div className="space-y-4">
+              {messages.map((msg) => (
+                <ChatBubble
+                  key={msg.id}
+                  role={msg.role}
+                  message={msg.message}
+                  imagePreview={msg.imagePreview}
+                  streamingData={msg.streamingData}
+                  isLoading={msg.isLoading}
+                />
+              ))}
 
-        {messages.map((msg) => (
-          <ChatBubble
-            key={msg.id}
-            role={msg.role}
-            message={msg.message}
-            imagePreview={msg.imagePreview}
-            streamingData={msg.streamingData}
-            isLoading={msg.isLoading}
-          />
-        ))}
-
-        <div ref={chatEndRef} />
-      </div>
-
-      {/* Input form */}
-      <form onSubmit={handleSubmit} className="space-y-2">
-        {/* Image preview */}
-        {imagePreview && (
-          <div className="relative inline-block">
-            <img
-              src={imagePreview}
-              alt="Selected"
-              className="h-20 rounded-lg border"
-            />
-            <button
-              type="button"
-              onClick={removeImage}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
+              <div ref={chatEndRef} />
+            </div>
           </div>
         )}
+      </div>
 
-        {/* Input row */}
-        <div className="flex gap-2">
-          <Input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageSelect}
-            accept="image/*"
-            className="hidden"
-          />
+      {/* Input form - full width with centered content */}
+      <div className="flex-none border-t bg-background px-6 py-4">
+        <div className="mx-auto max-w-4xl">
+          <form onSubmit={handleSubmit} className="space-y-2">
+            {/* Image preview */}
+            {imagePreview && (
+              <div className="relative inline-block">
+                <img
+                  src={imagePreview}
+                  alt="Selected"
+                  className="h-20 rounded-lg border"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isStreaming}
-          >
-            <ImagePlus className="w-5 h-5" />
-          </Button>
+            {/* Input row */}
+            <div className="flex gap-2">
+              <Input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
 
-          <Input
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type a message or upload a fridge photo..."
-            disabled={isStreaming}
-            className="flex-1"
-          />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isStreaming}
+                className="cursor-pointer"
+              >
+                <ImagePlus className="w-5 h-5" />
+              </Button>
 
-          <Button
-            type="submit"
-            disabled={isStreaming || (!inputMessage.trim() && !selectedImage)}
-          >
-            <Send className="w-5 h-5" />
-          </Button>
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type a message or upload a fridge photo..."
+                disabled={isStreaming}
+                className="flex-1"
+              />
+
+              <Button
+                type="submit"
+                disabled={
+                  isStreaming || (!inputMessage.trim() && !selectedImage)
+                }
+                className="cursor-pointer"
+              >
+                <Send className="w-5 h-5" />
+              </Button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
