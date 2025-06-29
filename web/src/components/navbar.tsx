@@ -5,9 +5,22 @@ export default function Navbar() {
     <header className = "fixed top-0 left-0 w-full bg-transparent z-50" >
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
         {/* App Name */}
-        <Link href="/" className="text-4xl text-blue-400 font-bold hover:opacity-90">
-          Fridger.ai
-        </Link>
+        <Link
+  href="/"
+  className="
+    text-4xl
+    font-bold
+    bg-gradient-to-r
+    from-blue-400
+    via-blue-500
+    to-[#215198]
+    bg-clip-text
+    text-transparent
+    hover:opacity-90
+  "
+>
+  Fridger.ai
+</Link>
 
         {/* Nav Links */}
         <nav>

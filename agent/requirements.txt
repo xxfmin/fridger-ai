@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic-ai
+python-dotenv
+logfire
+httpx
+google-generativeai
+Pillow

@@ -1,0 +1,15 @@
+# virtual environment
+venv/
+venv/lib
+
+# python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# environment variables
+.env
+
+# OS files
+.DS_Store
