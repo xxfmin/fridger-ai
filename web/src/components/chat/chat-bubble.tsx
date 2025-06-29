@@ -59,7 +59,9 @@ export function ChatBubble({
 }: ChatBubbleProps) {
   // Track step data for display
   const [stepData, setStepData] = useState<StepData>({});
-  const [stepStatuses, setStepStatuses] = useState<Record<StepName, StepStatus>>({
+  const [stepStatuses, setStepStatuses] = useState<
+    Record<StepName, StepStatus>
+  >({
     "Extract Ingredients": { status: "pending" },
     "Format Ingredients": { status: "pending" },
     "Search Recipes": { status: "pending" },
@@ -81,7 +83,7 @@ export function ChatBubble({
       step: streamingData.step,
       data: streamingData.data,
       summary: streamingData.summary,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Handle different message types
@@ -89,20 +91,20 @@ export function ChatBubble({
       case "step_update":
       case "step_complete": {
         if (!streamingData.step) return;
-        
+
         const currentStep = streamingData.step;
         const stepName = currentStep.step_name as StepName;
-        
+
         if (!RECIPE_STEPS.includes(stepName)) {
           console.warn(`Unknown step name: ${stepName}`);
           return;
         }
-        
+
         // Mark that we've started processing
         if (!hasStartedProcessing) {
           setHasStartedProcessing(true);
         }
-        
+
         // Update step status
         setStepStatuses((prev) => ({
           ...prev,
@@ -111,48 +113,48 @@ export function ChatBubble({
             message: currentStep.message,
           },
         }));
-        
+
         // Update step data for completed steps
         if (streamingData.type === "step_complete" && streamingData.data) {
           switch (stepName) {
             case "Extract Ingredients":
               if (streamingData.data.ingredients) {
-                setStepData((prev) => ({ 
-                  ...prev, 
-                  extractedIngredients: streamingData.data.ingredients 
+                setStepData((prev) => ({
+                  ...prev,
+                  extractedIngredients: streamingData.data.ingredients,
                 }));
                 setOpenItems((prev) => [...new Set([...prev, "extract"])]);
               }
               break;
-              
+
             case "Format Ingredients":
               if (streamingData.data.formatted) {
                 const formatted = streamingData.data.formatted
                   .split(",")
                   .map((s: string) => s.trim());
-                setStepData((prev) => ({ 
-                  ...prev, 
-                  formattedIngredients: formatted 
+                setStepData((prev) => ({
+                  ...prev,
+                  formattedIngredients: formatted,
                 }));
                 setOpenItems((prev) => [...new Set([...prev, "format"])]);
               }
               break;
-              
+
             case "Search Recipes":
               if (streamingData.data.recipe_count !== undefined) {
-                setStepData((prev) => ({ 
-                  ...prev, 
-                  recipeCount: streamingData.data.recipe_count 
+                setStepData((prev) => ({
+                  ...prev,
+                  recipeCount: streamingData.data.recipe_count,
                 }));
                 setOpenItems((prev) => [...new Set([...prev, "search"])]);
               }
               break;
-              
+
             case "Get Recipe Details":
               if (streamingData.data.details_count !== undefined) {
-                setStepData((prev) => ({ 
-                  ...prev, 
-                  detailsCount: streamingData.data.details_count 
+                setStepData((prev) => ({
+                  ...prev,
+                  detailsCount: streamingData.data.details_count,
                 }));
                 setOpenItems((prev) => [...new Set([...prev, "details"])]);
               }
@@ -161,76 +163,96 @@ export function ChatBubble({
         }
         break;
       }
-      
+
       case "complete": {
         console.log("Processing complete message");
-        
+
         // Mark processing as complete
         setIsProcessingComplete(true);
-        
+
         // Set final message
         if (streamingData.message) {
           setFinalMessage(streamingData.message);
         }
-        
+
         // Set recipes
         if (streamingData.summary?.recipes) {
           setFinalRecipes(streamingData.summary.recipes);
-          console.log(`Setting ${streamingData.summary.recipes.length} recipes`);
+          console.log(
+            `Setting ${streamingData.summary.recipes.length} recipes`
+          );
         }
-        
+
         // Ensure all completed steps show as completed using step_summary if available
         if (streamingData.step_summary) {
-          Object.entries(streamingData.step_summary).forEach(([stepName, state]: [string, any]) => {
-            if (state.completed && RECIPE_STEPS.includes(stepName as StepName)) {
-              setStepStatuses((prev) => ({
-                ...prev,
-                [stepName as StepName]: {
-                  status: "completed",
-                  message: prev[stepName as StepName]?.message || `${stepName} completed`
-                }
-              }));
-              
-              // Also ensure we have the step data
-              if (state.data) {
-                switch (stepName) {
-                  case "Extract Ingredients":
-                    if (Array.isArray(state.data)) {
-                      setStepData((prev) => ({ ...prev, extractedIngredients: state.data }));
-                    }
-                    break;
-                  case "Format Ingredients":
-                    if (typeof state.data === 'string') {
-                      setStepData((prev) => ({ 
-                        ...prev, 
-                        formattedIngredients: state.data.split(',').map((s: string) => s.trim()) 
-                      }));
-                    }
-                    break;
-                  case "Search Recipes":
-                    if (typeof state.data === 'number') {
-                      setStepData((prev) => ({ ...prev, recipeCount: state.data }));
-                    }
-                    break;
-                  case "Get Recipe Details":
-                    if (typeof state.data === 'number') {
-                      setStepData((prev) => ({ ...prev, detailsCount: state.data }));
-                    }
-                    break;
+          Object.entries(streamingData.step_summary).forEach(
+            ([stepName, state]: [string, any]) => {
+              if (
+                state.completed &&
+                RECIPE_STEPS.includes(stepName as StepName)
+              ) {
+                setStepStatuses((prev) => ({
+                  ...prev,
+                  [stepName as StepName]: {
+                    status: "completed",
+                    message:
+                      prev[stepName as StepName]?.message ||
+                      `${stepName} completed`,
+                  },
+                }));
+
+                // Also ensure we have the step data
+                if (state.data) {
+                  switch (stepName) {
+                    case "Extract Ingredients":
+                      if (Array.isArray(state.data)) {
+                        setStepData((prev) => ({
+                          ...prev,
+                          extractedIngredients: state.data,
+                        }));
+                      }
+                      break;
+                    case "Format Ingredients":
+                      if (typeof state.data === "string") {
+                        setStepData((prev) => ({
+                          ...prev,
+                          formattedIngredients: state.data
+                            .split(",")
+                            .map((s: string) => s.trim()),
+                        }));
+                      }
+                      break;
+                    case "Search Recipes":
+                      if (typeof state.data === "number") {
+                        setStepData((prev) => ({
+                          ...prev,
+                          recipeCount: state.data,
+                        }));
+                      }
+                      break;
+                    case "Get Recipe Details":
+                      if (typeof state.data === "number") {
+                        setStepData((prev) => ({
+                          ...prev,
+                          detailsCount: state.data,
+                        }));
+                      }
+                      break;
+                  }
                 }
               }
             }
-          });
+          );
         }
-        
+
         // Open first 3 accordions
         setOpenItems(["extract", "format", "search"]);
         break;
       }
-      
+
       case "error": {
         console.error("Received error:", streamingData);
-        
+
         if (streamingData.step) {
           const stepName = streamingData.step.step_name as StepName;
           if (RECIPE_STEPS.includes(stepName)) {
@@ -242,33 +264,36 @@ export function ChatBubble({
               },
             }));
           }
-          
+
           // Mark that we've started processing if we haven't already
           if (!hasStartedProcessing) {
             setHasStartedProcessing(true);
           }
         }
-        
+
         // If we have step summary from error, update states accordingly
         if (streamingData.step_summary) {
-          Object.entries(streamingData.step_summary).forEach(([stepName, state]: [string, any]) => {
-            if (RECIPE_STEPS.includes(stepName as StepName)) {
-              const typedStepName = stepName as StepName;
-              if (state.completed) {
-                setStepStatuses((prev) => ({
-                  ...prev,
-                  [typedStepName]: {
-                    status: "completed",
-                    message: prev[typedStepName]?.message || `${stepName} completed`
-                  }
-                }));
+          Object.entries(streamingData.step_summary).forEach(
+            ([stepName, state]: [string, any]) => {
+              if (RECIPE_STEPS.includes(stepName as StepName)) {
+                const typedStepName = stepName as StepName;
+                if (state.completed) {
+                  setStepStatuses((prev) => ({
+                    ...prev,
+                    [typedStepName]: {
+                      status: "completed",
+                      message:
+                        prev[typedStepName]?.message || `${stepName} completed`,
+                    },
+                  }));
+                }
               }
             }
-          });
+          );
         }
         break;
       }
-      
+
       case "message": {
         // Simple message response - no processing involved
         break;
@@ -449,14 +474,22 @@ export function ChatBubble({
                           <div className="flex items-center gap-2 ml-auto mr-2">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
                               {(() => {
-                                const status = stepStatuses["Extract Ingredients"]?.status;
+                                const status =
+                                  stepStatuses["Extract Ingredients"]?.status;
                                 if (status === "in_progress") {
-                                  return stepStatuses["Extract Ingredients"]?.message || "Analyzing fridge contents...";
+                                  return (
+                                    stepStatuses["Extract Ingredients"]
+                                      ?.message ||
+                                    "Analyzing fridge contents..."
+                                  );
                                 } else if (status === "completed") {
                                   if (stepData.extractedIngredients) {
                                     return `${stepData.extractedIngredients.length} ingredients found`;
                                   } else {
-                                    return stepStatuses["Extract Ingredients"]?.message || "Completed";
+                                    return (
+                                      stepStatuses["Extract Ingredients"]
+                                        ?.message || "Completed"
+                                    );
                                   }
                                 } else if (status === "error") {
                                   return "Error extracting ingredients";
@@ -489,12 +522,16 @@ export function ChatBubble({
                           </div>
                         ) : (
                           <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
-                            {stepStatuses["Extract Ingredients"]?.status === "in_progress"
+                            {stepStatuses["Extract Ingredients"]?.status ===
+                            "in_progress"
                               ? "Analyzing your fridge image..."
-                              : stepStatuses["Extract Ingredients"]?.status === "completed"
+                              : stepStatuses["Extract Ingredients"]?.status ===
+                                "completed"
                               ? "Ingredients extracted successfully"
-                              : stepStatuses["Extract Ingredients"]?.status === "error"
-                              ? stepStatuses["Extract Ingredients"]?.message || "Failed to extract ingredients"
+                              : stepStatuses["Extract Ingredients"]?.status ===
+                                "error"
+                              ? stepStatuses["Extract Ingredients"]?.message ||
+                                "Failed to extract ingredients"
                               : "Waiting to start..."}
                           </div>
                         )}
@@ -516,14 +553,25 @@ export function ChatBubble({
                           <div className="flex items-center gap-2 ml-auto mr-2">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
                               {(() => {
-                                const status = stepStatuses["Format Ingredients"]?.status;
+                                const status =
+                                  stepStatuses["Format Ingredients"]?.status;
                                 if (status === "in_progress") {
-                                  return stepStatuses["Format Ingredients"]?.message || "Formatting ingredients for recipe search...";
+                                  return (
+                                    stepStatuses["Format Ingredients"]
+                                      ?.message ||
+                                    "Formatting ingredients for recipe search..."
+                                  );
                                 } else if (status === "completed") {
-                                  if (stepData.formattedIngredients && stepData.extractedIngredients) {
+                                  if (
+                                    stepData.formattedIngredients &&
+                                    stepData.extractedIngredients
+                                  ) {
                                     return `Used ${stepData.formattedIngredients.length} of ${stepData.extractedIngredients.length} ingredients`;
                                   } else {
-                                    return stepStatuses["Format Ingredients"]?.message || "Completed";
+                                    return (
+                                      stepStatuses["Format Ingredients"]
+                                        ?.message || "Completed"
+                                    );
                                   }
                                 } else if (status === "error") {
                                   return "Error formatting ingredients";
@@ -556,12 +604,16 @@ export function ChatBubble({
                           </div>
                         ) : (
                           <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
-                            {stepStatuses["Format Ingredients"]?.status === "in_progress"
+                            {stepStatuses["Format Ingredients"]?.status ===
+                            "in_progress"
                               ? "Selecting key cooking ingredients..."
-                              : stepStatuses["Format Ingredients"]?.status === "completed"
+                              : stepStatuses["Format Ingredients"]?.status ===
+                                "completed"
                               ? "Ingredients formatted successfully"
-                              : stepStatuses["Format Ingredients"]?.status === "error"
-                              ? stepStatuses["Format Ingredients"]?.message || "Failed to format ingredients"
+                              : stepStatuses["Format Ingredients"]?.status ===
+                                "error"
+                              ? stepStatuses["Format Ingredients"]?.message ||
+                                "Failed to format ingredients"
                               : "Waiting for ingredient extraction..."}
                           </div>
                         )}
@@ -581,14 +633,21 @@ export function ChatBubble({
                           <div className="flex items-center gap-2 ml-auto mr-2">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
                               {(() => {
-                                const status = stepStatuses["Search Recipes"]?.status;
+                                const status =
+                                  stepStatuses["Search Recipes"]?.status;
                                 if (status === "in_progress") {
-                                  return stepStatuses["Search Recipes"]?.message || "Searching for recipes...";
+                                  return (
+                                    stepStatuses["Search Recipes"]?.message ||
+                                    "Searching for recipes..."
+                                  );
                                 } else if (status === "completed") {
                                   if (stepData.recipeCount !== undefined) {
                                     return `Found ${stepData.recipeCount} recipes`;
                                   } else {
-                                    return stepStatuses["Search Recipes"]?.message || "Completed";
+                                    return (
+                                      stepStatuses["Search Recipes"]?.message ||
+                                      "Completed"
+                                    );
                                   }
                                 } else if (status === "error") {
                                   return "Error searching recipes";
@@ -607,15 +666,20 @@ export function ChatBubble({
                       <AccordionContent>
                         <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
                           {(() => {
-                            const status = stepStatuses["Search Recipes"]?.status;
+                            const status =
+                              stepStatuses["Search Recipes"]?.status;
                             if (status === "in_progress") {
                               return "Searching for recipes that match your ingredients...";
                             } else if (status === "completed") {
                               return stepData.recipeCount !== undefined
                                 ? `Successfully found ${stepData.recipeCount} recipes matching your ingredients.`
-                                : stepStatuses["Search Recipes"]?.message || "Recipe search completed successfully.";
+                                : stepStatuses["Search Recipes"]?.message ||
+                                    "Recipe search completed successfully.";
                             } else if (status === "error") {
-                              return stepStatuses["Search Recipes"]?.message || "Failed to search for recipes.";
+                              return (
+                                stepStatuses["Search Recipes"]?.message ||
+                                "Failed to search for recipes."
+                              );
                             } else {
                               return "Waiting for formatted ingredients...";
                             }
@@ -640,14 +704,22 @@ export function ChatBubble({
                             <div className="flex items-center gap-2 ml-auto mr-2">
                               <span className="text-sm text-gray-600 dark:text-gray-400">
                                 {(() => {
-                                  const status = stepStatuses["Get Recipe Details"]?.status;
+                                  const status =
+                                    stepStatuses["Get Recipe Details"]?.status;
                                   if (status === "in_progress") {
-                                    return stepStatuses["Get Recipe Details"]?.message || "Fetching detailed information...";
+                                    return (
+                                      stepStatuses["Get Recipe Details"]
+                                        ?.message ||
+                                      "Fetching detailed information..."
+                                    );
                                   } else if (status === "completed") {
                                     if (stepData.detailsCount !== undefined) {
                                       return `Retrieved details for ${stepData.detailsCount} recipes`;
                                     } else {
-                                      return stepStatuses["Get Recipe Details"]?.message || "Completed";
+                                      return (
+                                        stepStatuses["Get Recipe Details"]
+                                          ?.message || "Completed"
+                                      );
                                     }
                                   } else if (status === "error") {
                                     return "Error getting details";
@@ -666,15 +738,21 @@ export function ChatBubble({
                         <AccordionContent>
                           <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
                             {(() => {
-                              const status = stepStatuses["Get Recipe Details"]?.status;
+                              const status =
+                                stepStatuses["Get Recipe Details"]?.status;
                               if (status === "in_progress") {
                                 return "Fetching nutritional information, ingredients, and cooking instructions...";
                               } else if (status === "completed") {
                                 return stepData.detailsCount !== undefined
                                   ? `Successfully retrieved complete details for ${stepData.detailsCount} recipes.`
-                                  : stepStatuses["Get Recipe Details"]?.message || "Details retrieved successfully.";
+                                  : stepStatuses["Get Recipe Details"]
+                                      ?.message ||
+                                      "Details retrieved successfully.";
                               } else if (status === "error") {
-                                return stepStatuses["Get Recipe Details"]?.message || "Failed to get recipe details.";
+                                return (
+                                  stepStatuses["Get Recipe Details"]?.message ||
+                                  "Failed to get recipe details."
+                                );
                               } else {
                                 return "Waiting for recipe search results...";
                               }
@@ -699,16 +777,6 @@ export function ChatBubble({
               {isProcessingComplete && recipeCards.length > 0 && (
                 <div className="mt-4">
                   <Carousel items={recipeCards} />
-                </div>
-              )}
-
-              {/* Debug info - remove in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-900 rounded text-xs">
-                  <p>Debug Info:</p>
-                  <p>Processing Complete: {isProcessingComplete ? 'Yes' : 'No'}</p>
-                  <p>Recipe Count: {finalRecipes.length}</p>
-                  <p>Has Final Message: {finalMessage ? 'Yes' : 'No'}</p>
                 </div>
               )}
             </>

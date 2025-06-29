@@ -388,8 +388,8 @@ function SavedRecipeContent({
           disabled={isDeleting}
           className={cn(
             "w-full rounded-lg px-4 py-3 font-medium transition-colors cursor-pointer flex items-center justify-center gap-2",
-            "bg-red-600 text-white hover:bg-red-700",
-            isDeleting && "opacity-50 cursor-not-allowed"
+            "bg-red-600 text-white hover:bg-red-700 cursor-pointer",
+            isDeleting && "opacity-50"
           )}
         >
           {isDeleting ? (

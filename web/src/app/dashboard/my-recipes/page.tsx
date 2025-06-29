@@ -42,7 +42,7 @@ export default function MyRecipesPage() {
 
   const handleDeleteRecipe = async (recipeId: string) => {
     try {
-      const response = await fetch(`/api/recipes/${recipeId}`, {
+      const response = await fetch(`/api/recipe/${recipeId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -85,66 +85,103 @@ export default function MyRecipesPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-950">
       {/* header */}
-      <div className="flex-none border-b bg-background px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="flex-none border-b bg-white dark:bg-neutral-900 px-6 py-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">My Recipes</h1>
-            <p className="text-sm text-muted-foreground">
-              Your saved recipe collection ({filteredRecipes.length} recipes)
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              My Recipes
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Your saved recipe collection ({filteredRecipes.length}{" "}
+              {filteredRecipes.length === 1 ? "recipe" : "recipes"})
             </p>
           </div>
 
           {/* search */}
-          <div className="relative w-96">
+          <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search your recipes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
             />
           </div>
         </div>
       </div>
 
       {/* content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        {filteredRecipes.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              {recipes.length === 0 ? (
-                <>
-                  <p className="text-lg text-gray-600 mb-2">
-                    No saved recipes yet
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Start chatting with the Recipe Agent to discover and save
-                    recipes!
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-lg text-gray-600 mb-2">No recipes found</p>
-                  <p className="text-sm text-gray-500">
-                    Try adjusting your search terms
-                  </p>
-                </>
-              )}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6 sm:p-8 lg:p-10">
+          {filteredRecipes.length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center max-w-md mx-auto">
+                {recipes.length === 0 ? (
+                  <>
+                    <div className="mb-4">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      No saved recipes yet
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Start chatting with the Recipe Agent to discover and save
+                      delicious recipes!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      No recipes found
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Try adjusting your search terms or browse all recipes
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredRecipes.map((recipe) => (
-              <SavedRecipeCard
-                key={recipe._id}
-                recipe={recipe}
-                onDelete={handleDeleteRecipe}
-              />
-            ))}
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-wrap gap-8 justify-center sm:justify-start">
+              {filteredRecipes.map((recipe) => (
+                <SavedRecipeCard
+                  key={recipe._id}
+                  recipe={recipe}
+                  onDelete={handleDeleteRecipe}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
