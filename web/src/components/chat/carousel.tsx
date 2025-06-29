@@ -246,7 +246,7 @@ export const Card = ({
     if (card.recipeId && !isSaved) {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/recipes", {
+        const response = await fetch("/api/recipe", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
