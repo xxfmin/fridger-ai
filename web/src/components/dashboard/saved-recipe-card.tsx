@@ -105,17 +105,17 @@ export function SavedRecipeCard({ recipe, onDelete }: SavedRecipeCardProps) {
               exit={{ opacity: 0 }}
               ref={containerRef}
               layoutId={`saved-card-${recipe._id}`}
-              className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-white p-4 font-sans md:p-10 dark:bg-neutral-900"
+              className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-white p-4 font-sans md:p-10"
             >
               <button
-                className="sticky top-4 right-0 ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black dark:bg-white cursor-pointer z-10"
+                className="sticky top-4 right-0 ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black cursor-pointer z-10"
                 onClick={handleClose}
               >
-                <IconX className="h-6 w-6 text-neutral-100 dark:text-neutral-900" />
+                <IconX className="h-6 w-6 text-neutral-100" />
               </button>
               <motion.p
                 layoutId={`saved-title-${recipe._id}`}
-                className="mt-4 text-2xl font-semibold text-neutral-700 md:text-5xl dark:text-white"
+                className="mt-4 text-2xl font-semibold text-neutral-700 md:text-5xl"
               >
                 {recipe.title}
               </motion.p>
@@ -130,10 +130,10 @@ export function SavedRecipeCard({ recipe, onDelete }: SavedRecipeCardProps) {
       <motion.div
         layoutId={`saved-card-${recipe._id}`}
         onClick={handleOpen}
-        className="relative z-10 flex h-[400px] w-[300px] cursor-pointer flex-col overflow-hidden border rounded-2xl bg-white shadow-lg transition-all hover:shadow-xl md:h-[420px] md:w-[340px] dark:bg-neutral-900"
+        className="relative z-10 flex h-[380px] w-full cursor-pointer flex-col overflow-hidden border rounded-2xl bg-white shadow-lg transition-all hover:shadow-xl"
       >
         {/* image */}
-        <div className="relative h-[180px] w-full overflow-hidden bg-gray-100 md:h-[200px]">
+        <div className="relative h-[180px] w-full overflow-hidden bg-gray-100">
           <BlurImage
             src={recipe.image || "/api/placeholder/400/600"}
             alt={recipe.title}
@@ -146,29 +146,29 @@ export function SavedRecipeCard({ recipe, onDelete }: SavedRecipeCardProps) {
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-colors hover:bg-red-50 dark:bg-black/90 dark:hover:bg-red-900/20"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-colors hover:bg-red-50"
             >
               {isDeleting ? (
                 <div className="animate-spin h-4 w-4 border-2 border-gray-600 border-t-transparent rounded-full" />
               ) : (
-                <Trash2 className="h-4 w-4 text-gray-600 hover:text-red-500 dark:text-gray-400" />
+                <Trash2 className="h-4 w-4 text-gray-600 hover:text-red-500" />
               )}
             </button>
           </div>
         </div>
 
         {/* content container */}
-        <div className="flex flex-1 flex-col justify-between p-5">
-          <div className="space-y-3">
+        <div className="flex flex-1 flex-col justify-between p-4">
+          <div className="space-y-2">
             <motion.h3
               layoutId={`saved-title-${recipe._id}`}
-              className="text-lg font-semibold text-gray-800 line-clamp-2 md:text-xl dark:text-white"
+              className="text-base font-semibold text-gray-800 line-clamp-2 lg:text-lg"
             >
               {recipe.title}
             </motion.h3>
 
             {/* recipe stats */}
-            <div className="flex flex-wrap gap-3 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-wrap gap-3 text-sm text-gray-600">
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
                 <span>{recipe.readyInMinutes} min</span>
@@ -184,14 +184,14 @@ export function SavedRecipeCard({ recipe, onDelete }: SavedRecipeCardProps) {
 
             {/* summary */}
             {recipe.summary && (
-              <p className="text-sm text-gray-600 line-clamp-2 dark:text-gray-400">
+              <p className="text-sm text-gray-600 line-clamp-2">
                 {recipe.summary.replace(/<[^>]*>/g, "")}
               </p>
             )}
           </div>
 
           {/* saved date */}
-          <div className="flex items-center gap-2 pt-3 text-xs text-gray-500 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 pt-2 mt-2 text-xs text-gray-500 border-t border-gray-100">
             <IconCalendar className="h-3 w-3" />
             <span>Saved {formatDate(recipe.createdAt)}</span>
           </div>
@@ -271,18 +271,18 @@ function SavedRecipeContent({
       </div>
 
       {/* save info */}
-      <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-        <h3 className="mb-2 text-sm font-semibold text-blue-900 dark:text-blue-100">
+      <div className="rounded-lg bg-blue-50 p-4">
+        <h3 className="mb-2 text-sm font-semibold text-blue-900">
           Recipe Saved
         </h3>
-        <div className="text-sm text-blue-800 dark:text-blue-200">
+        <div className="text-sm text-blue-800">
           <p>Saved on {formatDate(recipe.createdAt)}</p>
         </div>
       </div>
 
       {/* nutrition */}
       {recipe.nutrition && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
+        <div className="rounded-lg bg-gray-50 p-4">
           <h3 className="mb-3 text-sm font-semibold">Nutrition per serving</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {recipe.nutrition.calories && (
@@ -326,7 +326,7 @@ function SavedRecipeContent({
         <div>
           <h3 className="mb-2 text-lg font-semibold">About this recipe</h3>
           <div
-            className="prose prose-sm max-w-none text-gray-600 dark:text-gray-300"
+            className="prose prose-sm max-w-none text-gray-600"
             dangerouslySetInnerHTML={{
               __html: recipe.summary.replace(/<[^>]*>/g, ""),
             }}

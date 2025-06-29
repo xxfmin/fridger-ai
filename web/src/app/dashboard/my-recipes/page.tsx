@@ -85,38 +85,38 @@ export default function MyRecipesPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-950">
+    <div className="flex flex-col h-full bg-gray-50">
       {/* header */}
-      <div className="flex-none border-b bg-white dark:bg-neutral-900 px-6 py-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              My Recipes
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Your saved recipe collection ({filteredRecipes.length}{" "}
-              {filteredRecipes.length === 1 ? "recipe" : "recipes"})
-            </p>
-          </div>
+      <div className="flex-none border-b bg-white shadow-sm">
+        <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-4 mx-auto w-full max-w-screen-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">My Recipes</h1>
+              <p className="text-sm text-gray-600">
+                Your saved recipe collection ({filteredRecipes.length}{" "}
+                {filteredRecipes.length === 1 ? "recipe" : "recipes"})
+              </p>
+            </div>
 
-          {/* search */}
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="Search your recipes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
-            />
+            {/* search */}
+            <div className="relative w-full sm:w-96">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search your recipes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-gray-50 border-gray-200"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-6 sm:p-8 lg:p-10">
+      <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="p-4 sm:p-6 lg:p-8 xl:px-12 mx-auto w-full max-w-screen-2xl">
           {filteredRecipes.length === 0 ? (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex items-center justify-center min-h-[500px]">
               <div className="text-center max-w-md mx-auto">
                 {recipes.length === 0 ? (
                   <>
@@ -135,10 +135,10 @@ export default function MyRecipesPage() {
                         />
                       </svg>
                     </div>
-                    <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    <p className="text-lg font-medium text-gray-900 mb-2">
                       No saved recipes yet
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500">
                       Start chatting with the Recipe Agent to discover and save
                       delicious recipes!
                     </p>
@@ -160,10 +160,10 @@ export default function MyRecipesPage() {
                         />
                       </svg>
                     </div>
-                    <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    <p className="text-lg font-medium text-gray-900 mb-2">
                       No recipes found
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500">
                       Try adjusting your search terms or browse all recipes
                     </p>
                   </>
@@ -171,7 +171,7 @@ export default function MyRecipesPage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-8 justify-center sm:justify-start">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
               {filteredRecipes.map((recipe) => (
                 <SavedRecipeCard
                   key={recipe._id}

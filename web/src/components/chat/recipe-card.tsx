@@ -112,7 +112,7 @@ function RecipeCardContent({
 
       {/* nutrition */}
       {recipe.nutrition && (
-        <div className="rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
+        <div className="rounded-lg bg-gray-50 p-4">
           <h3 className="mb-3 text-sm font-semibold">Nutrition per serving</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {recipe.nutrition.calories && (
@@ -156,7 +156,7 @@ function RecipeCardContent({
         <div>
           <h3 className="mb-2 text-lg font-semibold">About this recipe</h3>
           <div
-            className="prose prose-sm max-w-none text-gray-600 dark:text-gray-300"
+            className="prose prose-sm max-w-none text-gray-600"
             dangerouslySetInnerHTML={{
               __html: recipe.summary.replace(/<[^>]*>/g, ""), // Strip HTML tags
             }}

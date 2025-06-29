@@ -390,11 +390,7 @@ export function ChatBubble({
 
   return (
     <div>
-      <Card
-        className={`mb-2 ${
-          role === "user" ? "bg-gray-200/75 dark:bg-gray-800" : ""
-        }`}
-      >
+      <Card className={`mb-2 ${role === "user" ? "bg-gray-200/75" : ""}`}>
         <CardHeader>
           <CardTitle className="text-small font-semibold">
             {role === "user" ? "You" : "Recipe Assistant"}
@@ -412,7 +408,7 @@ export function ChatBubble({
 
           {/* User message */}
           {role === "user" && message && (
-            <div className="prose prose-sm max-w-none dark:prose-invert">
+            <div className="prose prose-sm max-w-none">
               {formatMessage(message)}
             </div>
           )}
@@ -433,7 +429,7 @@ export function ChatBubble({
             <>
               {/* Simple message (no processing) */}
               {streamingData.type === "message" && (
-                <div className="prose prose-sm max-w-none dark:prose-invert">
+                <div className="prose prose-sm max-w-none">
                   {formatMessage(streamingData.message || "")}
                 </div>
               )}
@@ -442,7 +438,7 @@ export function ChatBubble({
               {streamingData.type === "error" && !hasStartedProcessing && (
                 <div className="flex items-start space-x-2">
                   <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <div className="prose prose-sm max-w-none">
                     <p className="text-red-600">
                       {streamingData.message ||
                         streamingData.error ||
@@ -472,7 +468,7 @@ export function ChatBubble({
                             </span>
                           </div>
                           <div className="flex items-center gap-2 ml-auto mr-2">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-gray-600">
                               {(() => {
                                 const status =
                                   stepStatuses["Extract Ingredients"]?.status;
@@ -521,7 +517,7 @@ export function ChatBubble({
                             )}
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
+                          <div className="text-sm text-gray-600 pt-2">
                             {stepStatuses["Extract Ingredients"]?.status ===
                             "in_progress"
                               ? "Analyzing your fridge image..."
@@ -551,7 +547,7 @@ export function ChatBubble({
                             </span>
                           </div>
                           <div className="flex items-center gap-2 ml-auto mr-2">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-gray-600">
                               {(() => {
                                 const status =
                                   stepStatuses["Format Ingredients"]?.status;
@@ -603,7 +599,7 @@ export function ChatBubble({
                             )}
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
+                          <div className="text-sm text-gray-600 pt-2">
                             {stepStatuses["Format Ingredients"]?.status ===
                             "in_progress"
                               ? "Selecting key cooking ingredients..."
@@ -631,7 +627,7 @@ export function ChatBubble({
                             <span className="font-medium">Search Recipes</span>
                           </div>
                           <div className="flex items-center gap-2 ml-auto mr-2">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-gray-600">
                               {(() => {
                                 const status =
                                   stepStatuses["Search Recipes"]?.status;
@@ -664,7 +660,7 @@ export function ChatBubble({
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
+                        <div className="text-sm text-gray-600 pt-2">
                           {(() => {
                             const status =
                               stepStatuses["Search Recipes"]?.status;
@@ -702,7 +698,7 @@ export function ChatBubble({
                               </span>
                             </div>
                             <div className="flex items-center gap-2 ml-auto mr-2">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="text-sm text-gray-600">
                                 {(() => {
                                   const status =
                                     stepStatuses["Get Recipe Details"]?.status;
@@ -736,7 +732,7 @@ export function ChatBubble({
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
+                          <div className="text-sm text-gray-600 pt-2">
                             {(() => {
                               const status =
                                 stepStatuses["Get Recipe Details"]?.status;
@@ -767,7 +763,7 @@ export function ChatBubble({
               {/* Final message when complete */}
               {isProcessingComplete && finalMessage && (
                 <div className="mt-6">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <div className="prose prose-sm max-w-none">
                     {formatMessage(finalMessage)}
                   </div>
                 </div>

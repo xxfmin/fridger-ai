@@ -113,7 +113,7 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
   };
 
   const setSavedRecipes = (recipeId: number) => {
-    setSavedRecipesState(prev => new Set(prev).add(recipeId));
+    setSavedRecipesState((prev) => new Set(prev).add(recipeId));
   };
 
   const isMobile = () => {
@@ -122,11 +122,11 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
 
   return (
     <CarouselContext.Provider
-      value={{ 
-        onCardClose: handleCardClose, 
+      value={{
+        onCardClose: handleCardClose,
         currentIndex,
         savedRecipes,
-        setSavedRecipes
+        setSavedRecipes,
       }}
     >
       <div className="relative w-full">
@@ -203,7 +203,8 @@ export const Card = ({
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { onCardClose, currentIndex, savedRecipes, setSavedRecipes } = useContext(CarouselContext);
+  const { onCardClose, currentIndex, savedRecipes, setSavedRecipes } =
+    useContext(CarouselContext);
 
   const isSaved = card.recipeId ? savedRecipes.has(card.recipeId) : false;
 
@@ -284,17 +285,17 @@ export const Card = ({
               exit={{ opacity: 0 }}
               ref={containerRef}
               layoutId={layout ? `card-${card.title}` : undefined}
-              className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-white p-4 font-sans md:p-10 dark:bg-neutral-900"
+              className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-white p-4 font-sans md:p-10"
             >
               <button
-                className="sticky top-4 right-0 ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black dark:bg-white cursor-pointer z-10"
+                className="sticky top-4 right-0 ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-black cursor-pointer z-10"
                 onClick={handleClose}
               >
-                <IconX className="h-6 w-6 text-neutral-100 dark:text-neutral-900" />
+                <IconX className="h-6 w-6 text-neutral-100" />
               </button>
               <motion.p
                 layoutId={layout ? `title-${card.title}` : undefined}
-                className="mt-4 text-2xl font-semibold text-neutral-700 md:text-5xl dark:text-white"
+                className="mt-4 text-2xl font-semibold text-neutral-700 md:text-5xl"
               >
                 {card.title}
               </motion.p>
@@ -306,7 +307,7 @@ export const Card = ({
       <motion.div
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex h-[360px] w-[300px] cursor-pointer flex-col overflow-hidden border rounded-2xl bg-white transition-all md:h-[380px] md:w-[340px] dark:bg-neutral-900"
+        className="relative z-10 flex h-[360px] w-[300px] cursor-pointer flex-col overflow-hidden border rounded-2xl bg-white transition-all md:h-[380px] md:w-[340px]"
       >
         {/* image */}
         <div className="relative h-[180px] w-full overflow-hidden bg-gray-100 md:h-[200px]">
@@ -323,14 +324,14 @@ export const Card = ({
           <div>
             <motion.h3
               layoutId={layout ? `title-${card.title}` : undefined}
-              className="mb-2 text-lg font-semibold text-gray-800 line-clamp-2 md:text-xl dark:text-white"
+              className="mb-2 text-lg font-semibold text-gray-800 line-clamp-2 md:text-xl"
             >
               {card.title}
             </motion.h3>
 
             <motion.div
               layoutId={layout ? `category-${card.category}` : undefined}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+              className="flex items-center gap-2 text-gray-600"
             >
               <svg
                 className="h-4 w-4 md:h-5 md:w-5"
@@ -356,8 +357,8 @@ export const Card = ({
             className={cn(
               "mt-3 w-full rounded-lg py-2.5 text-sm font-medium transition-all cursor-pointer flex items-center justify-center gap-2",
               isSaved
-                ? "bg-green-100 border-2 border-green-200 text-green-700 dark:bg-green-900 dark:border-green-700 dark:text-green-300"
-                : "border-2 border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700",
+                ? "bg-green-100 border-2 border-green-200 text-green-700"
+                : "border-2 border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50",
               isLoading && "opacity-50 cursor-not-allowed"
             )}
           >

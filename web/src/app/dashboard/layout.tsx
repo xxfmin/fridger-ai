@@ -112,13 +112,13 @@ const Logo = ({ onLogoClick }: { onLogoClick: () => void }) => {
   return (
     <div
       onClick={onLogoClick}
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black cursor-pointer"
+      className="relative z-20 flex items-center space-x-1 py-1 text-sm font-normal text-black cursor-pointer"
     >
-      <IconFridge className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      <IconFridge className="h-10 w-10 shrink-0 text-neutral-700 dark:text-neutral-200" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium whitespace-pre text-black dark:text-white"
+        className="font-bold whitespace-pre text-black text-xl dark:text-white"
       >
         Fridger.ai
       </motion.span>
