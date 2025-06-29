@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Navbar from '@/components/navbar';
-import { AuroraBackground } from '@/components/aurora-background';
-import axios from 'axios';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "@/components/navbar";
+import { AuroraBackground } from "@/components/aurora-background";
+import axios from "axios";
 
 export default function SignUpPage() {
   const router = useRouter();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [error, setError]       = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,22 +20,24 @@ export default function SignUpPage() {
     setError(null);
 
     if (!username.trim() || !password) {
-      setError('Username and password are required.');
+      setError("Username and password are required.");
       return;
     }
 
     setIsLoading(true);
     try {
-      const { data } = await axios.post('/api/users/signup', {
+      const { data } = await axios.post("/api/auth/signup", {
         username: username.trim(),
         password,
       });
       // Optionally display a toast or success banner here:
       // console.log('Signed up:', data.message);
-      router.push('/signin');  // send them to the sign-in page
+      router.push("/signin"); // send them to the sign-in page
     } catch (err: any) {
-      console.error('Signup error', err);
-      setError(err.response?.data?.message || 'Failed to sign up. Please try again.');
+      console.error("Signup error", err);
+      setError(
+        err.response?.data?.message || "Failed to sign up. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +59,7 @@ export default function SignUpPage() {
               <input
                 type="text"
                 value={username}
-                onChange={e => setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
                 className="w-full px-6 py-2 border border-white rounded-md bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white"
                 placeholder="Enter username"
@@ -71,7 +73,7 @@ export default function SignUpPage() {
               <input
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 className="w-full px-6 py-2 border border-white rounded-md bg-transparent text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white"
                 placeholder="Enter password"
@@ -84,11 +86,11 @@ export default function SignUpPage() {
               disabled={isLoading}
               className={`w-full py-2 font-semibold rounded-md transition ${
                 isLoading
-                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-700 text-white'
+                  ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-700 text-white"
               }`}
             >
-              {isLoading ? 'Signing Up…' : 'Sign Up'}
+              {isLoading ? "Signing Up…" : "Sign Up"}
             </button>
           </form>
         </div>
